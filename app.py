@@ -1,32 +1,29 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
+import os
 
-# Konfigurasi Halaman
-st.set_page_config(page_title="Tanya-Peternakan AI", page_icon="🐮")
+client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+
+def tanya_ternak(prompt):
+    response = client.models.generate_content(
+        model="gemini-2.0-flash-lite",
+        contents=f"""
+        Kamu adalah asisten ahli peternakan Indonesia yang ramah dan profesional.
+        Jawab dengan jelas dan praktis.
+
+        Pertanyaan: {prompt}
+        """
+    )
+    return response.text
+
 st.title("🐮 Tanya-Peternakan AI")
 
-# Koneksi ke API Google
-try:
-    api_key = st.secrets["GEMINI_API_KEY"]
-    genai.configure(api_key=api_key)
-    
-    # KUNCI PERBAIKAN: Memanggil model dengan jalur lengkap
-    model = genai.GenerativeModel('models/gemini-1.5-flash')
-except Exception as e:
-    st.error(f"Gagal konfigurasi: {e}")
+user_input = st.chat_input("Tanyakan sesuatu tentang ternak Bapak...")
 
-# Kotak Input Chat
-prompt = st.chat_input("Tanyakan sesuatu tentang ternak Bapak...")
-
-if prompt:
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    with st.chat_message("assistant"):
-        try:
-            # Menggunakan generasi teks standar
-            response = model.generate_content(prompt)
-            st.markdown(response.text)
-        except Exception as e:
-            st.error(f"Waduh Pak, masih ada kendala: {str(e)}")
-            st.info("Catatan: Jika error 404 berlanjut, kemungkinan API Key Bapak perlu dicek ulang di Google AI Studio.")
+if user_input:
+    st.chat_message("user").write(user_input)
+    try:
+        jawaban = tanya_ternak(user_input)
+        st.chat_message("assistant").write(jawaban)
+    except Exception as e:
+        st.error(f"Error: {e}")
