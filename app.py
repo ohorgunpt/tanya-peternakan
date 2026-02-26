@@ -6,8 +6,7 @@ import requests
 # ==============================
 
 API_KEY = st.secrets["OPENROUTER_API_KEY"]
-
-MODEL = "mistralai/mistral-7b-instruct"
+MODEL = "meta-llama/llama-3.1-8b-instruct"
 
 # ==============================
 # FUNGSI AI
@@ -56,25 +55,20 @@ st.set_page_config(page_title="🐮 Tanya-Peternakan AI", page_icon="🐮")
 st.title("🐮 Tanya-Peternakan AI")
 st.write("Konsultasi masalah sapi, kambing, domba, ayam, dan ternak lainnya.")
 
-# Simpan riwayat chat
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Tampilkan riwayat
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
-# Input user
 user_input = st.chat_input("Tanyakan sesuatu tentang ternak Bapak...")
 
 if user_input:
-    # Tampilkan pesan user
     st.chat_message("user").write(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     try:
         jawaban = tanya_ternak(user_input)
-
         st.chat_message("assistant").write(jawaban)
         st.session_state.messages.append({"role": "assistant", "content": jawaban})
 
