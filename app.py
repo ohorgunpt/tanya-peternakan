@@ -7,30 +7,26 @@ st.title("🐮 Tanya-Peternakan AI")
 
 # Koneksi ke API Google
 try:
-    # Mengambil kunci dari Secrets Streamlit yang sudah Bapak isi tadi
     api_key = st.secrets["GEMINI_API_KEY"]
     genai.configure(api_key=api_key)
     
-    # Nama model ini HARUS persis seperti ini agar tidak 404
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # KUNCI PERBAIKAN: Memanggil model dengan jalur lengkap
+    model = genai.GenerativeModel(model_name='models/gemini-1.5-flash')
 except Exception as e:
-    st.error("Gagal menyambungkan kunci API. Pastikan 'Advanced settings' sudah benar.")
+    st.error(f"Gagal konfigurasi: {e}")
 
 # Kotak Input Chat
 prompt = st.chat_input("Tanyakan sesuatu tentang ternak Bapak...")
 
 if prompt:
-    # Tampilkan chat User
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Proses jawaban AI
     with st.chat_message("assistant"):
         try:
-            # Mengirim pertanyaan ke AI
-            response = model.generate_content(f"Kamu adalah ahli peternakan Indonesia. Jawablah: {prompt}")
+            # Menggunakan generasi teks standar
+            response = model.generate_content(prompt)
             st.markdown(response.text)
         except Exception as e:
-            # Jika masih error, tampilkan pesan bantuan
-            st.error(f"Maaf Pak, ada gangguan teknis: {str(e)}")
-            st.info("Saran: Coba refresh halaman ini atau cek sisa kuota API Gemini Bapak.")
+            st.error(f"Waduh Pak, masih ada kendala: {str(e)}")
+            st.info("Catatan: Jika error 404 berlanjut, kemungkinan API Key Bapak perlu dicek ulang di Google AI Studio.")
