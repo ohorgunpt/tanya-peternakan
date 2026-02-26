@@ -1,32 +1,27 @@
-import gradio as gr
-from google import genai
+import streamlit as st
+import google.generativeai as genai
 import os
 
-# Konfigurasi API Key
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+# Konfigurasi Halaman
+st.set_page_config(page_title="Tanya-Peternakan AI", page_icon="🐮")
+st.title("🐮 Tanya-Peternakan AI")
 
-def tanya_ternak(message, history):
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash-lite",
-            contents=f"""
-            Kamu adalah asisten ahli peternakan Indonesia yang ramah dan profesional.
-            Jawab dengan jelas, praktis, dan mudah dipahami.
+# Ambil API KEY dari Secrets Streamlit
+api_key = st.secrets["GEMINI_API_KEY"]
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel('gemini-1.5-flash')
 
-            Pertanyaan: {message}
-            """
-        )
+# Input Chat
+prompt = st.chat_input("Tanyakan sesuatu tentang ternak Bapak...")
 
-        return response.text
+if prompt:
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-    except Exception as e:
-        return f"Maaf, ada kendala teknis: {str(e)}"
-
-demo = gr.ChatInterface(
-    fn=tanya_ternak,
-    title="🐮 Tanya-Peternakan AI",
-    description="Konsultasi masalah sapi, domba, kambing, ayam, dan ternak lainnya.",
-)
-
-if __name__ == "__main__":
-    demo.launch()
+    with st.chat_message("assistant"):
+        try:
+            full_prompt = f"Kamu adalah ahli peternakan Indonesia. Jawablah dengan ramah: {prompt}"
+            response = model.generate_content(full_prompt)
+            st.markdown(response.text)
+        except Exception as e:
+            st.error(f"Ada kendala: {e}")
