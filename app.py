@@ -52,7 +52,7 @@ def tanya_ternak(prompt):
 
 st.set_page_config(page_title="🐮 Tanya Peternakan AI-by TPN", page_icon="🐮")
 
-st.title("🐮 Tanya-Peternakan AI")
+st.title("🐮 Tanya-Peternakan AI-by TPN")
 st.write("Konsultasi masalah sapi, kambing, domba, ayam, dan ternak lainnya.")
 
 if "messages" not in st.session_state:
@@ -61,7 +61,7 @@ if "messages" not in st.session_state:
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
-user_input = st.chat_input("Tanyakan sesuatu tentang ternak Bapak...")
+user_input = st.chat_input("Tanyakan sesuatu tentang ternak...")
 
 if user_input:
     st.chat_message("user").write(user_input)
