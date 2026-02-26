@@ -1,22 +1,42 @@
 import streamlit as st
-from google import genai
-import os
+import requests
 
-client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+# Ambil API Key dari Streamlit Secrets
+API_KEY = st.secrets["OPENROUTER_API_KEY"]
 
 def tanya_ternak(prompt):
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-lite",
-        contents=f"""
-        Kamu adalah asisten ahli peternakan Indonesia yang ramah dan profesional.
-        Jawab dengan jelas dan praktis.
+    url = "https://openrouter.ai/api/v1/chat/completions"
 
-        Pertanyaan: {prompt}
-        """
-    )
-    return response.text
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json",
+    }
 
-st.title("🐮 Tanya-Peternakan AI")
+    data = {
+        "model": "mistralai/mistral-7b-instruct:free",
+        "messages": [
+            {
+                "role": "system",
+                "content": "Kamu adalah asisten ahli peternakan Indonesia yang ramah dan profesional. Jawab dengan jelas dan praktis."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code != 200:
+        return f"Error API: {response.text}"
+
+    result = response.json()
+    return result["choices"][0]["message"]["content"]
+
+
+# UI Streamlit
+st.title("🐮 Tanya-Peternakan AI (Mistral)")
 
 user_input = st.chat_input("Tanyakan sesuatu tentang ternak Bapak...")
 
