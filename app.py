@@ -11,7 +11,7 @@ try:
     genai.configure(api_key=api_key)
     
     # KUNCI PERBAIKAN: Memanggil model dengan jalur lengkap
-    model = genai.GenerativeModel(model_name='models/gemini-1.5-flash')
+    model = genai.GenerativeModel('models/gemini-1.5-flash')
 except Exception as e:
     st.error(f"Gagal konfigurasi: {e}")
 
