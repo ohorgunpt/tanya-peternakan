@@ -50,7 +50,7 @@ def tanya_ternak(prompt):
 # UI STREAMLIT
 # ==============================
 
-st.set_page_config(page_title="🐮 Tanya-Peternakan AI", page_icon="🐮")
+st.set_page_config(page_title="🐮 Tanya Peternakan AI-by TPN", page_icon="🐮")
 
 st.title("🐮 Tanya-Peternakan AI")
 st.write("Konsultasi masalah sapi, kambing, domba, ayam, dan ternak lainnya.")
