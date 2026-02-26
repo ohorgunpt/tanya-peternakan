@@ -1,8 +1,17 @@
 import streamlit as st
 import requests
 
-# Ambil API Key dari Streamlit Secrets
+# ==============================
+# KONFIGURASI
+# ==============================
+
 API_KEY = st.secrets["OPENROUTER_API_KEY"]
+
+MODEL = "mistralai/mistral-7b-instruct"
+
+# ==============================
+# FUNGSI AI
+# ==============================
 
 def tanya_ternak(prompt):
     url = "https://openrouter.ai/api/v1/chat/completions"
@@ -10,20 +19,23 @@ def tanya_ternak(prompt):
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",
+        "HTTP-Referer": "https://streamlit.io",
+        "X-Title": "Tanya-Peternakan-AI"
     }
 
     data = {
-        "model": "openchat/openchat-7b:free",
+        "model": MODEL,
         "messages": [
             {
                 "role": "system",
-                "content": "Kamu adalah asisten ahli peternakan Indonesia yang ramah dan profesional. Jawab dengan jelas dan praktis."
+                "content": "Kamu adalah asisten ahli peternakan Indonesia yang ramah, profesional, dan praktis. Jawab dengan jelas dan mudah dipahami peternak."
             },
             {
                 "role": "user",
                 "content": prompt
             }
-        ]
+        ],
+        "temperature": 0.7
     }
 
     response = requests.post(url, headers=headers, json=data)
@@ -35,15 +47,36 @@ def tanya_ternak(prompt):
     return result["choices"][0]["message"]["content"]
 
 
-# UI Streamlit
-st.title("🐮 Tanya-Peternakan AI (Mistral)")
+# ==============================
+# UI STREAMLIT
+# ==============================
 
+st.set_page_config(page_title="🐮 Tanya-Peternakan AI", page_icon="🐮")
+
+st.title("🐮 Tanya-Peternakan AI")
+st.write("Konsultasi masalah sapi, kambing, domba, ayam, dan ternak lainnya.")
+
+# Simpan riwayat chat
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Tampilkan riwayat
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
+
+# Input user
 user_input = st.chat_input("Tanyakan sesuatu tentang ternak Bapak...")
 
 if user_input:
+    # Tampilkan pesan user
     st.chat_message("user").write(user_input)
+    st.session_state.messages.append({"role": "user", "content": user_input})
+
     try:
         jawaban = tanya_ternak(user_input)
+
         st.chat_message("assistant").write(jawaban)
+        st.session_state.messages.append({"role": "assistant", "content": jawaban})
+
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Terjadi kesalahan: {e}")
